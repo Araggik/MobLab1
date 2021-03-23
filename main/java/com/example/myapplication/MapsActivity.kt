@@ -70,6 +70,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapCli
 
     override fun onMarkerClick(p0: Marker?): Boolean {
         val intent = Intent(this, MarkerActivity::class.java)
+        intent.putExtra("pos",p0!!.position.toString())
+        intent.putExtra("path",markers[p0!!.position].toString())
         startActivityForResult(intent,1)
         return true
     }

@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -21,7 +22,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapCli
 
     private lateinit var mMap: GoogleMap
 
-    private var markers: MutableMap<LatLng,URI?> = mutableMapOf()
+    private var markers: MutableMap<LatLng,Uri?> = mutableMapOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,11 +79,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMapCli
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
+        if(requestCode ==1 && resultCode == Activity.RESULT_OK)
+        {
+            val path = Uri.parse(data!!.getStringExtra("path"))
+            val strPos = data!!.getStringExtra("pos")!!.substringAfter(" ")
+            val lat = strPos!!.substringBefore(',').substringAfter("(").toDouble()
+            val lng = strPos!!.substringAfter(',').substringBefore(')').toDouble()
+            val pos =LatLng(lat, lng)
+            markers[pos]= path
+        }
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        markers = savedInstanceState.getSerializable("markers") as MutableMap<LatLng, Uri?>
         super.onRestoreInstanceState(savedInstanceState)
-        markers = savedInstanceState.getSerializable("markers") as MutableMap<LatLng, URI?>
     }
 }

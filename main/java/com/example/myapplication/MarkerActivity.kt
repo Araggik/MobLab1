@@ -2,6 +2,7 @@ package com.example.myapplication
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -50,7 +51,7 @@ class MarkerActivity : AppCompatActivity(){
         }
     }
 
-    @SuppressLint("SimpleDateFormat")
+
     private fun createImageFile(): File? {
         val imageFileName = "PNG_" +
                 SimpleDateFormat("yyyyMMdd_HHmmss").format(Date()) +
@@ -75,7 +76,7 @@ class MarkerActivity : AppCompatActivity(){
             if (photoFile != null) {
                 val photoURI: Uri = FileProvider.getUriForFile(
                         this,
-                        "com.example.myapplication",
+                        "com.example.myapplication.fileprovider",
                         photoFile
                 )
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
@@ -89,7 +90,11 @@ class MarkerActivity : AppCompatActivity(){
 
     fun saveOnClick(view: View)
     {
-
+        val intent = Intent(this, MapsActivity::class.java)
+        intent.putExtra("path", path)
+        intent.putExtra("pos", pos)
+        setResult(Activity.RESULT_OK, intent)
+        finish()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -100,5 +105,27 @@ class MarkerActivity : AppCompatActivity(){
             val uriPhoto = Uri.parse(path)
             imageView.setImageURI(uriPhoto)
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString("path",path)
+        outState.putString("pos",pos)
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        path = savedInstanceState.getString("path")
+        pos = savedInstanceState.getString("pos")
+        if(path!=null && path!="")
+        {
+            val imageView: ImageView = findViewById(R.id.imageView)
+            val uriPhoto = Uri.parse(path)
+            imageView.setImageURI(uriPhoto)
+        }
+        super.onRestoreInstanceState(savedInstanceState)
     }
 }
